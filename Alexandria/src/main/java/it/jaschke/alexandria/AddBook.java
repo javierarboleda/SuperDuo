@@ -55,7 +55,9 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SCAN_UPC_REQUEST) {
+
+        // if user hits back button, then resultCode != RESULT_OK
+        if (resultCode == Activity.RESULT_OK && requestCode == SCAN_UPC_REQUEST) {
             String upcCode = data.getStringExtra(getString(R.string.upc_code));
             mEan.setText(upcCode);
         }
@@ -196,9 +198,11 @@ public class AddBook extends Fragment implements LoaderManager.LoaderCallbacks<C
         ((TextView) mRootview.findViewById(R.id.bookSubTitle)).setText(bookSubTitle);
 
         String authors = data.getString(data.getColumnIndex(AlexandriaContract.AuthorEntry.AUTHOR));
-        String[] authorsArr = authors.split(",");
-        ((TextView) mRootview.findViewById(R.id.authors)).setLines(authorsArr.length);
-        ((TextView) mRootview.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+        if (authors != null) {
+            String[] authorsArr = authors.split(",");
+            ((TextView) mRootview.findViewById(R.id.authors)).setLines(authorsArr.length);
+            ((TextView) mRootview.findViewById(R.id.authors)).setText(authors.replace(",","\n"));
+        }
         String imgUrl = data.getString(data.getColumnIndex(AlexandriaContract.BookEntry.IMAGE_URL));
         if(Patterns.WEB_URL.matcher(imgUrl).matches()){
             new DownloadImage((ImageView) mRootview.findViewById(R.id.bookCover)).execute(imgUrl);
